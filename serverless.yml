@@ -1,0 +1,28 @@
+org: makinay
+app: aws-node-express-api
+service: aws-node-express-api
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  sendResponse:
+    handler: api/handlers.sendResponse
+    events:
+      - httpApi:
+          path: /api/results
+          method: post
+          request: 
+          schema:
+            application/json: ${file(./schemas/sendResponse.json)}
+  getResult:
+    handler: api/handlers.getResult
+    events:
+      - httpApi:
+          path: /api/results/{id}
+          method: get
+
+plugins:
+  - serverless-offline
