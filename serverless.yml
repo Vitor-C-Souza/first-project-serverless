@@ -8,14 +8,20 @@ params:
     dbName: alura-serveless
   dev:
     connectionString: mongodb://localhost:27017/${self:params.default.dbName}
+    salt: ctHuThHCjGXLwqYXGfHDACUpLhAVUTFF
+    jwtSecret: qPBXeyJWvzONiCgXKmPfPYoXVYoBAkAqcicvAausBFMJdTotyBuPzgCyugmWoFlg
   prod:
 
 provider:
+  httpApi:
+    cors: true
   name: aws
   runtime: nodejs18.x
   environment:
     MONGODB_CONNECTIONSTRING: ${param:connectionString}
     MONGODB_DB_NAME: ${param:dbName}
+    SALT: ${param:salt}
+    JWT_SECRET: ${param:jwtSecret}
 
 functions:
   sendResponse:
@@ -27,12 +33,24 @@ functions:
           request: 
           schema:
             application/json: ${file(./schemas/sendResponse.json)}
+
   getResult:
     handler: api/handlers.getResult
     events:
       - httpApi:
           path: /api/results/{id}
           method: get
+  
+  login:
+    handler: api/handlers.login
+    events:
+      - httpApi:
+          path: /api/login
+          method: post
+          request: 
+          schema:
+            application/json: ${file(./schemas/login.json)}
+            
 
 plugins:
   - serverless-offline
